@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music Mood Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>🎵 Music Mood Analyzer Dashboard</h1>
+
+    <!-- Back to Home -->
+    <button id="backHomeBtn" style="margin-bottom:20px;">← Back to Home</button>
+
+    <!-- Mood Summary Cards -->
+    <div id="moodCards" class="mood-cards"></div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <label for="moodFilter">Mood:</label>
+        <select id="moodFilter">
+            <option value="">All Moods</option>
+            <option value="Happy">Happy</option>
+            <option value="Sad">Sad</option>
+            <option value="Energetic">Energetic</option>
+            <option value="Calm">Calm</option>
+            <option value="Neutral">Neutral</option>
+        </select>
+
+        <label for="yearFilter">Year:</label>
+        <select id="yearFilter">
+            <option value="">All Years</option>
+            <option value="1970">1970</option>
+            <option value="1980">1980</option>
+            <option value="1990">1990</option>
+            <option value="2000">2000</option>
+            <option value="2010">2010</option>
+            <option value="2020">2020</option>
+        </select>
+    </div>
+
+    <!-- Tableau Dashboard Embed -->
+    <div id="vizContainer" style="margin-top:20px;"></div>
+
+    <!-- Songs Table -->
+    <table id="songTable" style="margin-top:20px; width:100%; border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th style="border:1px solid #ccc; padding:8px;">Song</th>
+                <th style="border:1px solid #ccc; padding:8px;">Artist</th>
+                <th style="border:1px solid #ccc; padding:8px;">Mood</th>
+                <th style="border:1px solid #ccc; padding:8px;">Energy</th>
+                <th style="border:1px solid #ccc; padding:8px;">Tempo</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Tableau JS -->
+<script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+
+<!-- Dashboard JS -->
+<script src="script.js"></script>
+</body>
+</html>
+

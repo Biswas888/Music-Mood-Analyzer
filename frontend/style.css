@@ -1,0 +1,154 @@
+/* ==============================
+   General Styles
+============================== */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* ==============================
+   Headings
+============================== */
+h1 {
+    text-align: center;
+    color: #1d3557;
+    margin-bottom: 30px;
+}
+
+/* ==============================
+   Buttons
+============================== */
+button {
+    background-color: #457b9d;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #1d3557;
+}
+
+/* ==============================
+   Mood Cards
+============================== */
+.mood-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.mood-card {
+    background-color: #a8dadc;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 120px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.mood-card:hover {
+    transform: translateY(-5px);
+    background-color: #457b9d;
+    color: #fff;
+}
+
+.mood-card h3 {
+    margin: 0 0 10px;
+}
+
+/* ==============================
+   Filters
+============================== */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.filters label {
+    font-weight: 500;
+}
+
+.filters select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* ==============================
+   Tableau Container
+============================== */
+#vizContainer {
+    width: 100%;
+    height: 600px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ==============================
+   Song Table
+============================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead tr {
+    background-color: #457b9d;
+    color: #fff;
+}
+
+thead th {
+    padding: 12px;
+    text-align: left;
+}
+
+tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tbody tr:hover {
+    background-color: #f1faee;
+}
+
+/* ==============================
+   Responsive Layout
+============================== */
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mood-cards {
+        justify-content: center;
+    }
+}
+
