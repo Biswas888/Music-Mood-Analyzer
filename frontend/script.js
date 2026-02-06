@@ -1,26 +1,17 @@
-// ==============================
-// API Base URL
-// ==============================
-const API_BASE = "http://localhost:8000"; // change if using Docker or different host
+// -------------------
+// Configuration
+// -------------------
+const API_BASE = "http://localhost:8000"; // Change if using Docker or different host
 
-// ==============================
-// Read initial filters from URL (landing page)
-// ==============================
-const urlParams = new URLSearchParams(window.location.search);
-const initialMood = urlParams.get("mood") || "";
-const initialYear = urlParams.get("year") || "";
-
-// Set filter selects to initial values
-document.getElementById("moodFilter").value = initialMood;
-document.getElementById("yearFilter").value = initialYear;
-
-// ==============================
-// Tableau Dashboard Setup
-// ==============================
+// -------------------
+// Tableau Dashboard
+// -------------------
 let viz;
 
 function initViz() {
     const containerDiv = document.getElementById("vizContainer");
+    if (!containerDiv) return;
+
     const url = "https://public.tableau.com/views/Book1_17431322165620/Dashboard1";
 
     const options = {
@@ -29,7 +20,6 @@ function initViz() {
         height: "90vh",
         onFirstInteractive: () => {
             console.log("✅ Tableau dashboard loaded");
-            // Apply initial filters if any
             applyTableauFilters();
         }
     };
@@ -37,47 +27,41 @@ function initViz() {
     viz = new tableau.Viz(containerDiv, url, options);
 }
 
-// ==============================
-// Tableau Filter Logic
-// ==============================
 function applyTableauFilters() {
     if (!viz) return;
 
     const workbook = viz.getWorkbook();
     const activeSheet = workbook.getActiveSheet();
 
-    const moodValue = document.getElementById("moodFilter").value;
-    const yearValue = document.getElementById("yearFilter").value;
+    const moodValue = document.getElementById("moodFilter")?.value;
+    const yearValue = document.getElementById("yearFilter")?.value;
+
+    const applyFiltersToSheet = (sheet) => {
+        if (moodValue) sheet.applyFilterAsync("Mood", moodValue, tableau.FilterUpdateType.REPLACE);
+        else sheet.clearFilterAsync("Mood");
+
+        if (yearValue) sheet.applyFilterAsync("Year", yearValue, tableau.FilterUpdateType.REPLACE);
+        else sheet.clearFilterAsync("Year");
+    };
 
     if (activeSheet.getSheetType() === "dashboard") {
         const worksheets = activeSheet.getWorksheets();
-        worksheets.forEach(sheet => {
-            applyFiltersToSheet(sheet, moodValue, yearValue);
-        });
+        worksheets.forEach(sheet => applyFiltersToSheet(sheet));
     } else {
-        applyFiltersToSheet(activeSheet, moodValue, yearValue);
+        applyFiltersToSheet(activeSheet);
     }
 }
 
-function applyFiltersToSheet(sheet, moodValue, yearValue) {
-    if (moodValue) sheet.applyFilterAsync("Mood", moodValue, tableau.FilterUpdateType.REPLACE);
-    else sheet.clearFilterAsync("Mood");
-
-    if (yearValue) sheet.applyFilterAsync("Year", yearValue, tableau.FilterUpdateType.REPLACE);
-    else sheet.clearFilterAsync("Year");
-}
-
-// ==============================
-// Backend Integration
-// ==============================
-
+// -------------------
 // Load Mood Cards
+// -------------------
 async function loadMoodCards() {
     try {
         const res = await fetch(`${API_BASE}/api/moods`);
         const data = await res.json();
 
         const container = document.getElementById("moodCards");
+        if (!container) return;
         container.innerHTML = "";
 
         data.forEach(item => {
@@ -88,8 +72,11 @@ async function loadMoodCards() {
                 <p>${item.count} songs</p>
             `;
             card.onclick = () => {
-                document.getElementById("moodFilter").value = item.mood;
-                applyFilters();
+                const moodFilter = document.getElementById("moodFilter");
+                if (moodFilter) {
+                    moodFilter.value = item.mood;
+                    applyFilters();
+                }
             };
             container.appendChild(card);
         });
@@ -98,11 +85,13 @@ async function loadMoodCards() {
     }
 }
 
+// -------------------
 // Load Songs Table
+// -------------------
 async function loadSongs() {
     try {
-        const mood = document.getElementById("moodFilter").value;
-        const year = document.getElementById("yearFilter").value;
+        const mood = document.getElementById("moodFilter")?.value || "";
+        const year = document.getElementById("yearFilter")?.value || "";
 
         let url = `${API_BASE}/api/songs?`;
         if (mood) url += `mood=${encodeURIComponent(mood)}&`;
@@ -112,6 +101,7 @@ async function loadSongs() {
         const songs = await res.json();
 
         const tbody = document.querySelector("#songTable tbody");
+        if (!tbody) return;
         tbody.innerHTML = "";
 
         if (!songs || songs.length === 0) {
@@ -135,29 +125,32 @@ async function loadSongs() {
     }
 }
 
-// ==============================
-// Apply Filters (Both Tableau + Backend)
-// ==============================
+// -------------------
+// Apply Filters
+// -------------------
 function applyFilters() {
-    applyTableauFilters(); // Tableau dashboard
-    loadSongs();           // Backend table
+    applyTableauFilters();
+    loadSongs();
 }
 
-// ==============================
+// -------------------
 // Event Listeners
-// ==============================
-document.getElementById("moodFilter").addEventListener("change", applyFilters);
-document.getElementById("yearFilter").addEventListener("change", applyFilters);
+// -------------------
+const moodFilter = document.getElementById("moodFilter");
+const yearFilter = document.getElementById("yearFilter");
 
-// Optional: Back to Home button
+if (moodFilter) moodFilter.addEventListener("change", applyFilters);
+if (yearFilter) yearFilter.addEventListener("change", applyFilters);
+
+// Back to Home button
 const backBtn = document.getElementById("backHomeBtn");
 if (backBtn) backBtn.addEventListener("click", () => {
     window.location.href = "index.html";
 });
 
-// ==============================
+// -------------------
 // Initialize Everything on Page Load
-// ==============================
+// -------------------
 window.onload = () => {
     initViz();
     loadMoodCards();

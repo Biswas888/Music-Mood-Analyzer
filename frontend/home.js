@@ -28,6 +28,10 @@ document.getElementById("dashboardBtn").addEventListener("click", () => {
     window.location.href = "dashboard.html";
 });
 
+document.getElementById("addSongBtn").addEventListener("click", () => {
+    window.location.href = "add_song.html";
+});
+
 // Initialize on load
 window.onload = () => {
     loadGeneralInfo();
