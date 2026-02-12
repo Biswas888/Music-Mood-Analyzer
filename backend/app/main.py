@@ -3,11 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pymysql
 import os
+import mysql.connector
 
 app = FastAPI()
 
-
-# CORS
+# --- CORS ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# DB connection
+# --- DB connection ---
 def get_db_connection():
     return pymysql.connect(
         host=os.getenv("MYSQL_HOST", "mysql_db"),
@@ -96,12 +96,12 @@ def add_song(song: SongCreate):
     conn.commit()
     cursor.close()
     conn.close()
-
     return {"message": f"Song '{song.name}' added successfully with mood '{mood}' 🎵"}
 
 # -------------------
 # GET: Search/filter songs
 # -------------------
+
 @app.get("/api/songs")
 def get_songs(mood: str = None, year: int = None, search: str = None):
     conn = get_db_connection()
@@ -110,9 +110,6 @@ def get_songs(mood: str = None, year: int = None, search: str = None):
     query = "SELECT name, artists, mood, energy, tempo, year FROM songs WHERE 1=1"
     params = []
 
-    if mood:
-        query += " AND mood = %s"
-        params.append(mood)
     if year:
         query += " AND year = %s"
         params.append(year)

@@ -22,10 +22,5 @@ CREATE TABLE songs (
     release_date DATE,
     speechiness FLOAT,
     tempo FLOAT,
-    mood VARCHAR(20) DEFAULT NULL
+    mood VARCHAR(20)
 );
-
--- Indexes for fast filtering
-CREATE INDEX idx_mood ON songs(mood);
-CREATE INDEX idx_year ON songs(year);
-CREATE INDEX idx_mood_year ON songs(mood, year);
