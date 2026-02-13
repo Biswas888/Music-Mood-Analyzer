@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Query
+from fastapi import Query
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import os
 import pymysql
+import time
 
 # -------------------
 # APP SETUP
@@ -22,14 +24,22 @@ app.add_middleware(
 # DATABASE CONNECTION
 # -------------------
 def get_db_connection():
-    return pymysql.connect(
-        host=os.getenv("MYSQL_HOST", "mysql_db"),
-        user=os.getenv("MYSQL_USER", "music_user"),
-        password=os.getenv("MYSQL_PASSWORD", "music_pass"),
-        database=os.getenv("MYSQL_DATABASE", "music_mood"),
-        port=int(os.getenv("MYSQL_PORT", 3306)),
-        cursorclass=pymysql.cursors.DictCursor
-    )
+    for i in range(10):   # try for ~10 seconds
+        try:
+            return pymysql.connect(
+                host=os.getenv("MYSQL_HOST", "db"),
+                user=os.getenv("MYSQL_USER", "music_user"),
+                password=os.getenv("MYSQL_PASSWORD", "music_pass"),
+                database=os.getenv("MYSQL_DATABASE", "music_mood"),
+                port=int(os.getenv("MYSQL_PORT", 3306)),
+                cursorclass=pymysql.cursors.DictCursor,
+                connect_timeout=5
+            )
+        except:
+            print("⏳ Waiting for MySQL...")
+            time.sleep(1)
+
+    raise Exception("❌ MySQL not ready after waiting")
 
 # -------------------
 # Pydantic Models

@@ -1,59 +1,23 @@
 import pandas as pd
 import mysql.connector
-import ast
 
-# --- CSV path inside container ---
-CSV_FILE = "/app/app/data/data.csv"
+CSV_FILE = "/app/app/data/data_cleaned.csv"
 
-# --- Load CSV ---
+# --- Load cleaned CSV ---
 df = pd.read_csv(CSV_FILE)
-print(f"✅ Loaded {len(df)} rows")
 
-# --- Fill missing values ---
-df.fillna({
-    "valence": 0.0,
-    "year": 0,
-    "acousticness": 0.0,
-    "artists": "Unknown",
-    "danceability": 0.0,
-    "duration_ms": 0,
-    "energy": 0.0,
-    "explicit": 0,
-    "id": "unknown_id",
-    "instrumentalness": 0.0,
-    "key": 0,
-    "liveness": 0.0,
-    "loudness": 0.0,
-    "mode": 0,
-    "name": "Unknown",
-    "popularity": 0,
-    "release_date": "1900-01-01",
-    "speechiness": 0.0,
-    "tempo": 0.0
-}, inplace=True)
-
-# --- Clean artists column ---
-def clean_artists(val):
-    try:
-        if isinstance(val, str) and val.startswith("["):
-            return ", ".join(ast.literal_eval(val))
-        return str(val)
-    except:
-        return str(val)
-
-df["artists"] = df["artists"].apply(clean_artists)
+print(f"✅ Loaded {len(df)} clean rows")
 
 # --- Fix release_date ---
 df["release_date"] = pd.to_datetime(df["release_date"], errors="coerce")
 df["release_date"] = df["release_date"].fillna(pd.Timestamp("1900-01-01"))
 df["release_date"] = df["release_date"].dt.strftime("%Y-%m-%d")
-df["release_date"] = df["release_date"].astype(str).str.strip()
 
-# --- Remove duplicate IDs before inserting ---
+# --- Remove duplicates ---
 df = df.drop_duplicates(subset=["id"])
 print(f"✅ {len(df)} rows after removing duplicates")
 
-# --- Add Mood column before inserting ---
+# --- Add Mood column ---
 def get_mood(row):
     if row['valence'] > 0.6 and row['energy'] > 0.6:
         return 'Happy'
@@ -79,7 +43,7 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 print("✅ Connected to MySQL!")
 
-# --- Insert query (skip duplicates in DB) ---
+# --- Insert query ---
 insert_sql = """
 INSERT IGNORE INTO songs (
     valence, year, acousticness, artists, danceability, duration_ms, energy,
@@ -93,16 +57,12 @@ INSERT IGNORE INTO songs (
 )
 """
 
-# --- Bulk insert for speed ---
 cursor.executemany(insert_sql, df.to_dict(orient="records"))
 conn.commit()
-print(f"✅ Inserted {len(df)} rows (duplicates skipped automatically)")
+
+print(f"✅ Inserted {len(df)} rows")
 
 cursor.close()
 conn.close()
-print("🎉 Done inserting all rows!")
 
-# --- Optional: save CSV with mood ---
-CSV_EXPORT = "/app/app/data/song_moods.csv"
-df.to_csv(CSV_EXPORT, index=False)
-print(f"✅ CSV ready: {CSV_EXPORT}")
+print("🎉 Clean data loaded successfully!")
