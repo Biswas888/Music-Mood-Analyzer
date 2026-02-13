@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add New Song</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.container{
+    max-width:550px;
+    margin:auto;
+    padding:30px;
+}
+
+form{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px 20px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+label{
+    font-weight:600;
+    margin-bottom:6px;
+    font-size:14px;
+}
+
+input,select{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button{
+    grid-column:span 2;
+    margin-top:10px;
+    padding:12px;
+    background:#4CAF50;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#43a047;
+}
+
+.search-section{
+    max-width:550px;
+    margin:40px auto;
+    text-align:center;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:8px;
+    border:1px solid #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>➕ Add New Song</h1>
+
+<form id="addSongForm">
+
+<div class="form-group"><label>Song ID</label><input id="songId" name="id" required></div>
+<div class="form-group"><label>Name</label><input id="songName" name="name" required></div>
+<div class="form-group"><label>Artists</label><input id="songArtists" name="artists" required></div>
+<div class="form-group"><label>Year</label><input id="songYear" type="number" name="year"></div>
+    <input type="number" name="year"></div>
+
+<div class="form-group"><label>Valence</label>
+  <select id="songValence" name="valence">
+    <option value="0.1">Very Sad</option>
+    <option value="0.3">Sad</option>
+    <option value="0.5" selected>Neutral</option>
+    <option value="0.7">Happy</option>
+    <option value="0.9">Very Happy</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Energy</label>
+  <select id="songEnergy" name="energy">
+    <option value="0.1">Very Low</option>
+    <option value="0.3">Low</option>
+    <option value="0.5" selected>Medium</option>
+    <option value="0.7">High</option>
+    <option value="0.9">Very High</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Danceability</label>
+  <select id="songDanceability" name="danceability">
+    <option value="0.1">Very Low</option>
+    <option value="0.3">Low</option>
+    <option value="0.5" selected>Medium</option>
+    <option value="0.7">High</option>
+    <option value="0.9">Very High</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Acousticness</label>
+  <select id="songAcousticness" name="acousticness">
+    <option value="0.1">Very Low</option>
+    <option value="0.3">Low</option>
+    <option value="0.5" selected>Medium</option>
+    <option value="0.7">High</option>
+    <option value="0.9">Very High</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Instrumentalness</label>
+  <select id="songInstrumentalness" name="instrumentalness">
+    <option value="0.0">None</option>
+    <option value="0.3">Low</option>
+    <option value="0.6">Medium</option>
+    <option value="0.9">High</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Speechiness</label>
+  <select id="songSpeechiness" name="speechiness">
+    <option value="0.1">Very Low</option>
+    <option value="0.3">Low</option>
+    <option value="0.5" selected>Medium</option>
+    <option value="0.7">High</option>
+    <option value="0.9">Very High</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Liveness</label>
+  <select id="songLiveness" name="liveness">
+    <option value="0.1">Studio</option>
+    <option value="0.3">Mostly Studio</option>
+    <option value="0.5" selected>Balanced</option>
+    <option value="0.7">Live Feel</option>
+    <option value="0.9">Concert</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Tempo (BPM)</label>
+  <select id="songTempo" name="tempo">
+    <option value="60">Slow</option>
+    <option value="90">Chill</option>
+    <option value="120" selected>Medium</option>
+    <option value="150">Fast</option>
+    <option value="180">Very Fast</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Duration (ms)</label><input id="songDuration" name="duration_ms"></div>
+
+<div class="form-group"><label>Popularity</label>
+  <select id="songPopularity" name="popularity">
+    <option value="20">Low</option>
+    <option value="40">Medium</option>
+    <option value="60" selected>High</option>
+    <option value="80">Very High</option>
+    <option value="100">Hit</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Loudness (dB)</label>
+  <select id="songLoudness" name="loudness">
+    <option value="-25">Very Quiet</option>
+    <option value="-15">Quiet</option>
+    <option value="-8" selected>Normal</option>
+    <option value="-4">Loud</option>
+    <option value="0">Very Loud</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Mode</label>
+  <select id="songMode" name="mode">
+    <option value="1">Major</option>
+    <option value="0">Minor</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Explicit</label>
+  <select id="songExplicit" name="explicit">
+    <option value="0">No</option>
+    <option value="1">Yes</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Key</label>
+  <select id="songKey" name="key">
+    <option>0</option><option>1</option><option>2</option><option>3</option>
+    <option>4</option><option>5</option><option>6</option><option>7</option>
+    <option>8</option><option>9</option><option>10</option><option>11</option>
+  </select>
+</div>
+
+<div class="form-group"><label>Release Date</label><input id="songReleaseDate" type="date" name="release_date" required></div>
+
+<button type="submit">Add Song</button>
+
+</form>
+<button onclick="location.href='dashboard.html'">← Back to Dashboard</button>
+</div>
+
+<div class="search-section">
+<label>Search Song / Artist</label><br>
+<input id="searchInput">
+<button id="searchBtn">Search</button>
+
+<table id="searchTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Artists</th>
+            <th>Mood</th>
+            <th>Year</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Pagination buttons -->
+<div id="pagination" style="margin-top:10px;"></div>
+
+
+<script src="add_song.js"></script>
+</body>
+</html>
