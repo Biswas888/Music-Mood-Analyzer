@@ -2,28 +2,14 @@ import pandas as pd
 import mysql.connector
 import ast
 
-# -----------------------
-# CONFIG
-# -----------------------
-CSV_FILE = "/app/app/data/data.csv"  # adjust if needed inside container
+# --- CSV path inside container ---
+CSV_FILE = "/app/app/data/data.csv"
 
-DB_CONFIG = {
-    "host": "db",        # Docker service name
-    "port": 3306,
-    "user": "music_user",
-    "password": "music_pass",
-    "database": "music_mood"
-}
-
-# -----------------------
-# LOAD CSV
-# -----------------------
+# --- Load CSV ---
 df = pd.read_csv(CSV_FILE)
 print(f"✅ Loaded {len(df)} rows")
 
-# -----------------------
-# CLEAN DATA
-# -----------------------
+# --- Fill missing values ---
 df.fillna({
     "valence": 0.0,
     "year": 0,
@@ -46,6 +32,7 @@ df.fillna({
     "tempo": 0.0
 }, inplace=True)
 
+# --- Clean artists column ---
 def clean_artists(val):
     try:
         if isinstance(val, str) and val.startswith("["):
@@ -56,68 +43,66 @@ def clean_artists(val):
 
 df["artists"] = df["artists"].apply(clean_artists)
 
-# -----------------------
-# FIX DATES
-# -----------------------
+# --- Fix release_date ---
 df["release_date"] = pd.to_datetime(df["release_date"], errors="coerce")
 df["release_date"] = df["release_date"].fillna(pd.Timestamp("1900-01-01"))
 df["release_date"] = df["release_date"].dt.strftime("%Y-%m-%d")
+df["release_date"] = df["release_date"].astype(str).str.strip()
 
-# -----------------------
-# REMOVE DUPLICATES
-# -----------------------
+# --- Remove duplicate IDs before inserting ---
 df = df.drop_duplicates(subset=["id"])
-print(f"✅ {len(df)} rows after dedupe")
+print(f"✅ {len(df)} rows after removing duplicates")
 
-# -----------------------
-# MOOD CLASSIFICATION
-# -----------------------
+# --- Add Mood column before inserting ---
 def get_mood(row):
-    if row["valence"] > 0.6 and row["energy"] > 0.6:
-        return "Happy"
-    elif row["valence"] < 0.4 and row["energy"] < 0.4:
-        return "Sad"
-    elif row["energy"] > 0.7 and row["tempo"] > 120:
-        return "Energetic"
-    elif row["acousticness"] > 0.6 and row["energy"] < 0.5:
-        return "Calm"
+    if row['valence'] > 0.6 and row['energy'] > 0.6:
+        return 'Happy'
+    elif row['valence'] < 0.4 and row['energy'] < 0.4:
+        return 'Sad'
+    elif row['energy'] > 0.7 and row['tempo'] > 120:
+        return 'Energetic'
+    elif row['acousticness'] > 0.6 and row['energy'] < 0.5:
+        return 'Calm'
     else:
-        return "Neutral"
+        return 'Neutral'
 
-df["mood"] = df.apply(get_mood, axis=1)
+df['mood'] = df.apply(get_mood, axis=1)
 
-# -----------------------
-# CONNECT TO MYSQL
-# -----------------------
-conn = mysql.connector.connect(**DB_CONFIG)
+# --- Connect to MySQL ---
+conn = mysql.connector.connect(
+    host="db",
+    port=3306,
+    user="music_user",
+    password="music_pass",
+    database="music_mood"
+)
 cursor = conn.cursor()
-print("✅ Connected to MySQL")
+print("✅ Connected to MySQL!")
 
-# -----------------------
-# INSERT DATA
-# -----------------------
+# --- Insert query (skip duplicates in DB) ---
 insert_sql = """
 INSERT IGNORE INTO songs (
-    id, name, artists, valence, year, acousticness, danceability,
-    duration_ms, energy, explicit, instrumentalness, `key`,
-    liveness, loudness, mode, popularity, release_date,
-    speechiness, tempo, mood
+    valence, year, acousticness, artists, danceability, duration_ms, energy,
+    explicit, id, instrumentalness, `key`, liveness, loudness, mode, name,
+    popularity, release_date, speechiness, tempo, mood
 ) VALUES (
-    %(id)s, %(name)s, %(artists)s, %(valence)s, %(year)s,
-    %(acousticness)s, %(danceability)s, %(duration_ms)s,
-    %(energy)s, %(explicit)s, %(instrumentalness)s, %(key)s,
-    %(liveness)s, %(loudness)s, %(mode)s, %(popularity)s,
+    %(valence)s, %(year)s, %(acousticness)s, %(artists)s, %(danceability)s,
+    %(duration_ms)s, %(energy)s, %(explicit)s, %(id)s, %(instrumentalness)s,
+    %(key)s, %(liveness)s, %(loudness)s, %(mode)s, %(name)s, %(popularity)s,
     %(release_date)s, %(speechiness)s, %(tempo)s, %(mood)s
 )
 """
 
-data = df.to_dict(orient="records")
-
-cursor.executemany(insert_sql, data)
+# --- Bulk insert for speed ---
+cursor.executemany(insert_sql, df.to_dict(orient="records"))
 conn.commit()
-
-print(f"🎉 Inserted {cursor.rowcount} rows into songs")
+print(f"✅ Inserted {len(df)} rows (duplicates skipped automatically)")
 
 cursor.close()
 conn.close()
-print("✅ Done!")
+print("🎉 Done inserting all rows!")
+
+# --- Optional: save CSV with mood ---
+CSV_EXPORT = "/app/app/data/song_moods.csv"
+df.to_csv(CSV_EXPORT, index=False)
+print(f"✅ CSV ready: {CSV_EXPORT}")

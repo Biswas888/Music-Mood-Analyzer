@@ -1,21 +1,26 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import pymysql
+from typing import List, Optional
 import os
-import mysql.connector
+import pymysql
 
-app = FastAPI()
+# -------------------
+# APP SETUP
+# -------------------
+app = FastAPI(title="Music Mood Analyzer API")
 
-# --- CORS ---
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # change to your frontend URL in production
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- DB connection ---
+# -------------------
+# DATABASE CONNECTION
+# -------------------
 def get_db_connection():
     return pymysql.connect(
         host=os.getenv("MYSQL_HOST", "mysql_db"),
@@ -26,7 +31,9 @@ def get_db_connection():
         cursorclass=pymysql.cursors.DictCursor
     )
 
-# Pydantic model
+# -------------------
+# Pydantic Models
+# -------------------
 class SongCreate(BaseModel):
     valence: float
     year: int
@@ -49,9 +56,9 @@ class SongCreate(BaseModel):
     tempo: float
 
 # -------------------
-# Mood calculation
+# MOOD CALCULATION
 # -------------------
-def calculate_mood(valence, energy, acousticness, tempo):
+def calculate_mood(valence: float, energy: float, acousticness: float, tempo: float) -> str:
     if valence > 0.6 and energy > 0.6:
         return "Happy"
     elif valence < 0.4 and energy < 0.4:
@@ -60,38 +67,35 @@ def calculate_mood(valence, energy, acousticness, tempo):
         return "Energetic"
     elif acousticness > 0.6 and energy < 0.5:
         return "Calm"
-    else:
-        return "Neutral"
+    return "Neutral"
 
 # -------------------
-# POST: Add song
+# POST: Add Song
 # -------------------
 @app.post("/api/songs")
 def add_song(song: SongCreate):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
     mood = calculate_mood(song.valence, song.energy, song.acousticness, song.tempo)
-
     sql = """
-    INSERT INTO songs (
-        valence, year, acousticness, artists, danceability, duration_ms,
-        energy, explicit, id, instrumentalness, `key`, liveness,
-        loudness, mode, name, popularity, release_date,
-        speechiness, tempo, mood
-    ) VALUES (
-        %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
-        %s,%s,%s,%s,%s,%s,%s,%s,%s,%s
-    )
+        INSERT INTO songs (
+            valence, year, acousticness, artists, danceability, duration_ms,
+            energy, explicit, id, instrumentalness, `key`, liveness,
+            loudness, mode, name, popularity, release_date,
+            speechiness, tempo, mood
+        ) VALUES (
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s
+        )
+        ON DUPLICATE KEY UPDATE mood=%s
     """
-
     values = (
         song.valence, song.year, song.acousticness, song.artists, song.danceability,
         song.duration_ms, song.energy, song.explicit, song.id, song.instrumentalness,
         song.key, song.liveness, song.loudness, song.mode, song.name,
-        song.popularity, song.release_date, song.speechiness, song.tempo, mood
+        song.popularity, song.release_date, song.speechiness, song.tempo, mood,
+        mood
     )
-
+    conn = get_db_connection()
+    cursor = conn.cursor()
     cursor.execute(sql, values)
     conn.commit()
     cursor.close()
@@ -99,33 +103,52 @@ def add_song(song: SongCreate):
     return {"message": f"Song '{song.name}' added successfully with mood '{mood}' 🎵"}
 
 # -------------------
-# GET: Search/filter songs
+# GET: Search / Filter Songs (with pagination)
 # -------------------
-
 @app.get("/api/songs")
-def get_songs(mood: str = None, year: int = None, search: str = None):
+def get_songs(
+    mood: str = None,
+    year: int = None,
+    search: str = None,
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0)
+):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    query = "SELECT name, artists, mood, energy, tempo, year FROM songs WHERE 1=1"
+    query = """
+        SELECT name, artists, mood, energy, tempo, year
+        FROM songs
+        WHERE 1=1
+    """
     params = []
+
+    if mood:
+        query += " AND mood = %s"
+        params.append(mood)
 
     if year:
         query += " AND year = %s"
         params.append(year)
+
     if search:
         query += " AND (name LIKE %s OR artists LIKE %s)"
-        search_term = f"%{search}%"
-        params.extend([search_term, search_term])
+        s = f"%{search}%"
+        params.extend([s, s])
+
+    query += " LIMIT %s OFFSET %s"
+    params.extend([limit, offset])
 
     cursor.execute(query, params)
     rows = cursor.fetchall()
+
     cursor.close()
     conn.close()
+
     return rows
 
 # -------------------
-# GET: All moods
+# GET: All Moods
 # -------------------
 @app.get("/api/moods")
 def get_moods():
