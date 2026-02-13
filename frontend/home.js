@@ -36,3 +36,24 @@ document.getElementById("addSongBtn").addEventListener("click", () => {
 window.onload = () => {
     loadGeneralInfo();
 };
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const options = {
+        width: "100%",
+        height: "100%",
+        hideTabs: true,
+        hideToolbar: true,
+        device: "desktop"
+    };
+
+    const container1 = document.getElementById("vizContainer1");
+    const container2 = document.getElementById("vizContainer2");
+
+    const url1 = "https://public.tableau.com/views/YourDashboard/Dashboard1";
+    const url2 = "https://public.tableau.com/views/YourDashboard/Dashboard2";
+
+    const viz1 = new tableau.Viz(container1, url1, options);
+    const viz2 = new tableau.Viz(container2, url2, options);
+
+});
