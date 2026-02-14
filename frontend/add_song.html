@@ -5,72 +5,6 @@
 <title>Add New Song</title>
 <link rel="stylesheet" href="style.css">
 
-<style>
-.container{
-    max-width:550px;
-    margin:auto;
-    padding:30px;
-}
-
-form{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px 20px;
-}
-
-.form-group{
-    display:flex;
-    flex-direction:column;
-}
-
-label{
-    font-weight:600;
-    margin-bottom:6px;
-    font-size:14px;
-}
-
-input,select{
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #ccc;
-}
-
-button{
-    grid-column:span 2;
-    margin-top:10px;
-    padding:12px;
-    background:#4CAF50;
-    color:white;
-    border:none;
-    border-radius:10px;
-    font-size:16px;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#43a047;
-}
-
-.search-section{
-    max-width:550px;
-    margin:40px auto;
-    text-align:center;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th,td{
-    padding:8px;
-    border:1px solid #ccc;
-}
-</style>
-</head>
-
-<body>
-
 <div class="container">
 <h1>➕ Add New Song</h1>
 
@@ -80,7 +14,6 @@ th,td{
 <div class="form-group"><label>Name</label><input id="songName" name="name" required></div>
 <div class="form-group"><label>Artists</label><input id="songArtists" name="artists" required></div>
 <div class="form-group"><label>Year</label><input id="songYear" type="number" name="year"></div>
-    <input type="number" name="year"></div>
 
 <div class="form-group"><label>Valence</label>
   <select id="songValence" name="valence">

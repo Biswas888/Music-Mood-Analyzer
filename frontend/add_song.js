@@ -195,35 +195,3 @@ window.addEventListener("load", () => {
     loadMoods();
 });
 
-let tableauViz;
-
-function initTableau() {
-    const containerDiv = document.getElementById("vizContainer");
-    if (!containerDiv) return;
-
-    const url = "https://public.tableau.com/views/YourDashboard/Sheet1"; // replace with your dashboard URL
-    const options = {
-        width: containerDiv.offsetWidth,
-        height: containerDiv.offsetHeight,
-        hideTabs: true,
-        hideToolbar: true
-    };
-
-    // Remove old viz if exists
-    if (tableauViz) tableauViz.dispose();
-
-    tableauViz = new tableau.Viz(containerDiv, url, options);
-}
-
-// Resize Tableau on window resize
-window.addEventListener("resize", () => {
-    const containerDiv = document.getElementById("vizContainer");
-    if (tableauViz && containerDiv) {
-        tableauViz.setFrameSize(containerDiv.offsetWidth, containerDiv.offsetHeight);
-    }
-});
-
-// Initialize Tableau after page load
-window.addEventListener("load", () => {
-    initTableau();
-});
