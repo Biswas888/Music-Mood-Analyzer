@@ -172,4 +172,14 @@ def get_moods():
     return rows
 
 #for deployment
-app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
+# 1. Get the absolute path of the directory containing main.py (e.g., /app/app)
+current_file_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 2. Move up one level to the parent directory where 'frontend' lives (e.g., /app)
+project_root = os.path.dirname(current_file_dir)
+
+# 3. Create the full path to the frontend folder
+frontend_path = os.path.join(project_root, "frontend")
+
+# 4. Mount it
+app.mount("/", StaticFiles(directory=frontend_path, html=True), name="static")
