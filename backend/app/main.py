@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+from fastapi.staticfiles import StaticFiles
 import os
 import pymysql
 import time
@@ -169,3 +170,6 @@ def get_moods():
     cursor.close()
     conn.close()
     return rows
+
+#for deployment
+app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
