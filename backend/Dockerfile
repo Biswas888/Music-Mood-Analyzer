@@ -1,13 +1,14 @@
 FROM python:3.11-slim
-
 WORKDIR /app
 
-COPY requirements.txt .
-
+# Copy from the 'backend' folder
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./frontend ./frontend
+# Copy from the 'frontend' folder (at the root)
+COPY frontend ./frontend
 
-COPY ./app ./app
+# Copy the 'app' folder from inside 'backend'
+COPY backend/app ./app
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
