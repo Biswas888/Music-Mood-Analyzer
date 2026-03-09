@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Songs Explorer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>🎵 Live Songs Explorer</h1>
+
+  <div class="section">
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search by song name..." />
+      <button id="searchBtn">Search</button>
+    </div>
+    <div id="categoryContainer" class="btn-group">
+      <p style="width: 100%; margin-bottom: 5px;"><strong>Browse Categories:</strong></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <strong>How are you feeling?</strong>
+    <div id="mood-buttons" class="btn-group"></div>
+  </div>
+
+  <h2 id="view-title">Latest Tracks</h2>
+  <div id="songList" class="results-grid"></div>
+
+  <!-- External JS -->
+  <script src="live.js"></script>
+</body>
+</html>

@@ -4,10 +4,10 @@ services:
     container_name: mysql_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}   # root password
-      MYSQL_DATABASE: ${MYSQL_DATABASE}            # optional initial DB
-      MYSQL_USER: ${MYSQL_USER}                    # non-root user
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}            # non-root password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -21,8 +21,8 @@ services:
       - db
     environment:
       PMA_HOST: db
-      PMA_USER: ${MYSQL_USER}                      # use non-root user
-      PMA_PASSWORD: ${MYSQL_PASSWORD}              # password for non-root user
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "8080:80"
 
@@ -35,8 +35,13 @@ services:
       MYSQL_HOST: db
       MYSQL_PORT: 3306
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}                    # use non-root user
+      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+      # MOVE THEM HERE
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+
     ports:
       - "8000:8000"
     volumes:

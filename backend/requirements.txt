@@ -4,3 +4,4 @@ pymysql
 python-dotenv
 pandas
 mysql-connector-python
+requests
